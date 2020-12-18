@@ -50,5 +50,24 @@ bool Odom::SetMedianValue(const SensorPtr &front_ptr, const SensorPtr &back_ptr,
 std::string Odom::Name() {
     return "odom-sensor";
 }
+void Odom::ToRosMsg(const OdomPtr &odom, nav_msgs::Odometry odom_ros,
+                    const std::string& frame_id, const std::string& child_frame_id) {
+    odom_ros.header.frame_id = frame_id;
+    odom_ros.child_frame_id = child_frame_id;
+    ToRosMsg(odom, odom_ros);
+}
+void Odom::ToRosMsg(const OdomPtr &odom, nav_msgs::Odometry odom_ros) {
+    odom_ros.header.stamp = ros::Time(odom->timestamp_);
+
+    odom_ros.pose.pose.orientation.w = odom->q_.w();
+    odom_ros.pose.pose.orientation.x = odom->q_.x();
+    odom_ros.pose.pose.orientation.y = odom->q_.y();
+    odom_ros.pose.pose.orientation.z = odom->q_.z();
+
+    odom_ros.pose.pose.position.x = odom->t_.x();
+    odom_ros.pose.pose.position.y = odom->t_.y();
+    odom_ros.pose.pose.position.z = odom->t_.z();
+
+}
 
 }

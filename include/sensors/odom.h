@@ -23,7 +23,9 @@ public:
                                 SensorPtr &median_ptr) override;
     std::string Name() override;
     Eigen::Matrix4d Pose();
-
+    static void ToRosMsg(const OdomPtr &odom, nav_msgs::Odometry odom_ros);
+    static void ToRosMsg(const OdomPtr &odom, nav_msgs::Odometry odom_ros,
+                        const std::string& frame_id, const std::string& child_frame_id);
 public:
     Eigen::Quaterniond q_;
     Eigen::Vector3d t_;

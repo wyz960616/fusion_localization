@@ -18,8 +18,10 @@ public:
     LaserScan(): Sensor(0){}
     explicit LaserScan(const sensor_msgs::LaserScanConstPtr& laser_scan_ptr);
     std::string Name() override;
+    static void ToRosMsg(const ScanPtr& laser_scan, sensor_msgs::LaserScan& laser_scan_ros);
 public:
     sensor_msgs::LaserScanConstPtr laser_scan_const_ptr;
+
 };
 
 }

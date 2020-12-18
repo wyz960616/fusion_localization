@@ -14,4 +14,8 @@ std::string LaserScan::Name() {
     return "laser-scan-sensor";
 }
 
+void LaserScan::ToRosMsg(const ScanPtr& laser_scan, sensor_msgs::LaserScan& laser_scan_ros) {
+    laser_scan_ros = *(laser_scan->laser_scan_const_ptr);
+}
+
 }
