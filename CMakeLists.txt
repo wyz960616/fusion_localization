@@ -24,6 +24,7 @@ include(cmake/YAML.cmake)
 include(cmake/eigen.cmake)
 include(cmake/g2o.cmake)
 include(cmake/sophus.cmake)
+include(cmake/global_definition.cmake)
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 
