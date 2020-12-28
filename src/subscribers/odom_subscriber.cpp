@@ -16,14 +16,14 @@ void OdomSubscriber::OdomMsgCallBack(const nav_msgs::OdometryConstPtr &odom_msg)
     SensorPtr new_odom_ptr = SensorFactory::CreateOdomPtr(odom_msg);
     {
         SUB_LOCK(mutex_);
-        new_un_synced_data_.push_back(new_odom_ptr);
+        raw_data_.push_back(new_odom_ptr);
     }
 
 #ifdef PRINT_TEST_INFO
     {
         SUB_LOCK(mutex_);
-        std::cout << new_un_synced_data_.back()->timestamp_ << std::endl
-        <<CAST_TO_ODOM(new_un_synced_data_.back())->Pose()<< std::endl;
+        std::cout << raw_data_.back()->timestamp_ << std::endl
+        <<CAST_TO_ODOM(raw_data_.back())->Pose()<< std::endl;
     }
 #endif
     

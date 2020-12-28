@@ -19,10 +19,13 @@ public:
     virtual bool SyncedData(double synced_timestamp);
 
 public:
-    std::deque<SensorPtr> new_un_synced_data_;
-    std::deque<SensorPtr> un_synced_data_;
-    std::deque<SensorPtr> synced_data_;
+    //保障多线程安全的deque
+    //@ raw_data作为缓存用于接收ROS传来的数据
+    //@ pushed_data作为实际操作的数据
+    std::deque<SensorPtr> raw_data_;
+    std::deque<SensorPtr> pushed_data_;
 
+    std::deque<SensorPtr> synced_data_;
 protected:
     ros::NodeHandle nh_;
     ros::Subscriber subscriber_;

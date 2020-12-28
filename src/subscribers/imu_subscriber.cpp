@@ -15,12 +15,12 @@ void ImuSubscriber::ImuMsgCallBack(const sensor_msgs::ImuConstPtr &imu_msg) {
     ImuPtr new_imu_ptr = SensorFactory::CreateImuPtr(imu_msg);
     {
         SUB_LOCK(mutex_)
-        new_un_synced_data_.push_back(new_imu_ptr);
+        raw_data_.push_back(new_imu_ptr);
     }
 #ifdef PRINT_TEST_INFO
     {
         std::lock_guard<std::mutex> lock(mutex_);
-        auto imu_ptr = CAST_TO_IMU(new_un_synced_data_.back());
+        auto imu_ptr = CAST_TO_IMU(raw_data_.back());
         std::cout << imu_ptr->Name() << "时间戳: "<<imu_ptr->timestamp_ << std::endl;
     }
 #endif

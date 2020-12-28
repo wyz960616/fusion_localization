@@ -38,9 +38,9 @@ void DataPretreat::InitParameters(const YAML::Node &config_node) {
 }
 
 bool DataPretreat::ReadData() {
-    static std::deque<SensorPtr>& un_synced_laser_data = laser_subscriber_->un_synced_data_;
+    static std::deque<SensorPtr>& un_synced_laser_data = laser_subscriber_->pushed_data_;
     static std::deque<SensorPtr>& laser_data = laser_subscriber_->synced_data_;
-    static std::deque<SensorPtr>& un_synced_odom_data = odom_subscriber_->un_synced_data_;
+    static std::deque<SensorPtr>& un_synced_odom_data = odom_subscriber_->pushed_data_;
     //从subscriber（带锁）取出数据到un_synced_data
     laser_subscriber_->ParseData();
     odom_subscriber_->ParseData();

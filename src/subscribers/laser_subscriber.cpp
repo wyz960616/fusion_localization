@@ -15,7 +15,7 @@ void LaserSubscriber::LaserMsgCallBack(const sensor_msgs::LaserScanConstPtr &las
     LaserScanPtr new_scan_ptr = SensorFactory::CreateLaserScanPtr(laser_msg);
     {
         SUB_LOCK(mutex_);
-        new_un_synced_data_.push_back(new_scan_ptr);
+        raw_data_.push_back(new_scan_ptr);
     }
 
 #ifdef PRINT_TEST_INFO

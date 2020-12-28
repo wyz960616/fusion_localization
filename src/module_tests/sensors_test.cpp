@@ -15,8 +15,8 @@ std::shared_ptr<OdomSubscriber> odom_subscriber;
 std::shared_ptr<LaserSubscriber> laser_subscriber;
 int iter = 0;
 bool ReadData() {
-    static std::deque<SensorPtr>& un_synced_laser_data = laser_subscriber->un_synced_data_;
-    static std::deque<SensorPtr>& un_synced_odom_data = odom_subscriber->un_synced_data_;
+    static std::deque<SensorPtr>& un_synced_laser_data = laser_subscriber->pushed_data_;
+    static std::deque<SensorPtr>& un_synced_odom_data = odom_subscriber->pushed_data_;
     static std::deque<SensorPtr>& synced_laser_data = laser_subscriber->synced_data_;
     static std::deque<SensorPtr>& synced_odom_data = odom_subscriber->synced_data_;
 

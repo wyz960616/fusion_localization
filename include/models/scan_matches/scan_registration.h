@@ -6,7 +6,6 @@
 #define LIDAR_LOCALIZATION_SCAN_REGISTRATION_H
 
 #include "sensors/laser_scan.h"
-#include <yaml-cpp/yaml.h>
 #include <Eigen/Core>
 namespace fusion_localization {
 class ScanRegistration {
@@ -14,15 +13,15 @@ public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     ScanRegistration() = default;
     void SetParameters(const LaserScanPtr &current_laser_scan_ptr, const LaserScanPtr &last_laser_scan_ptr,
-                 const Eigen::Matrix4d &rough_estimate);
-    void SetParameters(const LaserScanPtr &current_laser_scan_ptr, const Eigen::Matrix4d &rough_estimate);
-    bool Match(const Eigen::Matrix4d &precise_estimated);
+                 const Eigen::Matrix3d &rough_estimate);
+    void SetParameters(const LaserScanPtr &current_laser_scan_ptr, const Eigen::Matrix3d &rough_estimate);
+    virtual bool Match(const Eigen::Matrix4d &precise_estimated)  = 0;
 
 protected:
     LaserScanPtr current_laser_scan_ptr_;
     LaserScanPtr last_laser_scan_ptr_;
 
-    Eigen::Matrix4d rough_estimate_;
+    Eigen::Matrix3d rough_estimate_;
 
 };
 
