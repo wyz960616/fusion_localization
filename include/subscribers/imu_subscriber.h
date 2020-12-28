@@ -4,7 +4,7 @@
 
 #ifndef LIDAR_LOCALIZATION_IMU_SUBSCRIBER_H
 #define LIDAR_LOCALIZATION_IMU_SUBSCRIBER_H
-#include "sensors/imu.h"
+#include "sensors/sensor_factory.h"
 #include "subscribers/subscriber.h"
 #include <ros/ros.h>
 #include <thread>

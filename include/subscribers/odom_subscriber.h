@@ -4,7 +4,7 @@
 
 #ifndef LIDAR_LOCALIZATION_ODOMSUBSCRIBER_H
 #define LIDAR_LOCALIZATION_ODOMSUBSCRIBER_H
-#include "sensors/odom.h"
+#include "sensors/sensor_factory.h"
 #include "subscribers/subscriber.h"
 #include <ros/ros.h>
 #include <mutex>

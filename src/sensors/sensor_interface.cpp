@@ -37,8 +37,11 @@ bool Sensor::SyncData(std::deque<SensorPtr>& un_synced_data, double synced_times
         }
         break;
     }
-    if (un_synced_data.size() < 2)
+    //TODO
+    //属于另外一种情况，对齐的数据还没到，可以额外添加这种标志位
+    if (un_synced_data.size() < 2) {
         return false;
+    }
 
     SensorPtr front_senor_ptr = un_synced_data.at(0);
     SensorPtr last_sensor_ptr = un_synced_data.at(1);

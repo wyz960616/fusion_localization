@@ -4,16 +4,19 @@
 
 #ifndef LIDAR_LOCALIZATION_LASER_PUBLISHER_H
 #define LIDAR_LOCALIZATION_LASER_PUBLISHER_H
-#include "sensors/laser_scan.h"
+#include "sensors/sensor_factory.h"
 #include <ros/ros.h>
 namespace fusion_localization {
 class LaserPublisher {
 public:
-    LaserPublisher(const ros::NodeHandle& nh, const std::string& laser_topic, int buf_size);
-    void Publish(const ScanPtr& laser_scan);
+    LaserPublisher(const ros::NodeHandle& nh, const std::string& laser_topic, int buf_size, std::string frame_id);
+    void Publish(const LaserScanPtr& laser_scan);
 private:
     ros::NodeHandle nh_;
     ros::Publisher publisher_;
+    std::string frame_id_;
+
+    sensor_msgs::LaserScan laser_scan_ros_;
 };
 
 }

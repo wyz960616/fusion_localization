@@ -12,7 +12,7 @@ LaserSubscriber::LaserSubscriber(const ros::NodeHandle &nh, std::string scan_top
 }
 
 void LaserSubscriber::LaserMsgCallBack(const sensor_msgs::LaserScanConstPtr &laser_msg) {
-    ScanPtr new_scan_ptr = std::make_shared<LaserScan>(laser_msg);
+    LaserScanPtr new_scan_ptr = SensorFactory::CreateLaserScanPtr(laser_msg);
     {
         SUB_LOCK(mutex_);
         new_un_synced_data_.push_back(new_scan_ptr);

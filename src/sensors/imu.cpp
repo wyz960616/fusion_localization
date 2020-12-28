@@ -8,20 +8,6 @@ namespace fusion_localization {
 Eigen::Matrix3d Imu::Rotation(){
     return orientation_.toRotationMatrix();
 }
-Imu::Imu(const sensor_msgs::ImuConstPtr& imu_msg) : Sensor(imu_msg->header.stamp.toSec()) {
-    orientation_.w() = imu_msg->orientation.w;
-    orientation_.x() = imu_msg->orientation.x;
-    orientation_.y() = imu_msg->orientation.y;
-    orientation_.z() = imu_msg->orientation.z;
-
-    linear_acceleration_.x() = imu_msg->linear_acceleration.x;
-    linear_acceleration_.y() = imu_msg->linear_acceleration.y;
-    linear_acceleration_.z() = imu_msg->linear_acceleration.z;
-
-    angular_velocity_.x() = imu_msg->angular_velocity.x;
-    angular_velocity_.y() = imu_msg->angular_velocity.y;
-    angular_velocity_.z() = imu_msg->angular_velocity.z;
-}
 
 bool Imu::SetMedianValue(const SensorPtr& front_ptr, const SensorPtr& back_ptr, double synced_timestamp,
                     SensorPtr& median_ptr) {

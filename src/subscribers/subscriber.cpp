@@ -19,6 +19,8 @@ bool Subscriber::ParseData() {
     return true;
 }
 
+//使用虚函数，可以重载对齐函数，但在绝大多数情况下，基类Sensor中的SyncData已经能够满足需求
+//一般需要重载的是设置对齐的函数SetMedianValue
 bool Subscriber::SyncedData(double synced_timestamp) {
     if(single_sensor_->SyncData(un_synced_data_, synced_timestamp, synced_data_)) {
         return true;

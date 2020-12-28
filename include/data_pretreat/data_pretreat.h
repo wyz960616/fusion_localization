@@ -28,12 +28,12 @@ private:
     ros::NodeHandle nh_;
     std::shared_ptr<OdomSubscriber> odom_subscriber_;
     std::shared_ptr<LaserSubscriber> laser_subscriber_;
-    std::shared_ptr<OdomPublihser> odom_publisher_;
+    std::shared_ptr<OdomPublisher> odom_publisher_;
     std::shared_ptr<LaserPublisher> laser_publisher_;
 
     OdomPtr synced_odom_;
-    ScanPtr distorted_laser_;
-    ScanPtr undistorted_laser_;
+    LaserScanPtr distorted_laser_;
+    LaserScanPtr undistorted_laser_;
 };
 
 }

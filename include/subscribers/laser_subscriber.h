@@ -4,7 +4,7 @@
 
 #ifndef LIDAR_LOCALIZATION_LASER_SUBSCRIBER_H
 #define LIDAR_LOCALIZATION_LASER_SUBSCRIBER_H
-#include "sensors/laser_scan.h"
+#include "sensors/sensor_factory.h"
 #include "subscribers/subscriber.h"
 #include <ros/ros.h>
 namespace fusion_localization {

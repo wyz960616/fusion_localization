@@ -14,18 +14,6 @@ Eigen::Matrix4d Odom::Pose() {
     return pose;
 }
 
-
-Odom::Odom(const nav_msgs::OdometryConstPtr& odom_msg): Sensor(odom_msg->header.stamp.toSec()) {
-    q_.w() = odom_msg->pose.pose.orientation.w;
-    q_.x() = odom_msg->pose.pose.orientation.x;
-    q_.y() = odom_msg->pose.pose.orientation.y;
-    q_.z() = odom_msg->pose.pose.orientation.z;
-
-    t_.x() = odom_msg->pose.pose.position.x;
-    t_.y() = odom_msg->pose.pose.position.y;
-    t_.z() = odom_msg->pose.pose.position.z;
-}
-
 //SyncData中调用该重载函数，完成时间戳对齐操作
 bool Odom::SetMedianValue(const SensorPtr &front_ptr, const SensorPtr &back_ptr, double synced_timestamp,
                           SensorPtr &median_ptr) {
@@ -49,25 +37,6 @@ bool Odom::SetMedianValue(const SensorPtr &front_ptr, const SensorPtr &back_ptr,
 
 std::string Odom::Name() {
     return "odom-sensor";
-}
-void Odom::ToRosMsg(const OdomPtr &odom, nav_msgs::Odometry odom_ros,
-                    const std::string& frame_id, const std::string& child_frame_id) {
-    odom_ros.header.frame_id = frame_id;
-    odom_ros.child_frame_id = child_frame_id;
-    ToRosMsg(odom, odom_ros);
-}
-void Odom::ToRosMsg(const OdomPtr &odom, nav_msgs::Odometry odom_ros) {
-    odom_ros.header.stamp = ros::Time(odom->timestamp_);
-
-    odom_ros.pose.pose.orientation.w = odom->q_.w();
-    odom_ros.pose.pose.orientation.x = odom->q_.x();
-    odom_ros.pose.pose.orientation.y = odom->q_.y();
-    odom_ros.pose.pose.orientation.z = odom->q_.z();
-
-    odom_ros.pose.pose.position.x = odom->t_.x();
-    odom_ros.pose.pose.position.y = odom->t_.y();
-    odom_ros.pose.pose.position.z = odom->t_.z();
-
 }
 
 }

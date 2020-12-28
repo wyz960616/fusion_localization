@@ -12,7 +12,7 @@ ImuSubscriber::ImuSubscriber(const ros::NodeHandle& nh, std::string imu_topic_na
 }
 
 void ImuSubscriber::ImuMsgCallBack(const sensor_msgs::ImuConstPtr &imu_msg) {
-    ImuPtr new_imu_ptr = std::make_shared<Imu>(imu_msg);
+    ImuPtr new_imu_ptr = SensorFactory::CreateImuPtr(imu_msg);
     {
         SUB_LOCK(mutex_)
         new_un_synced_data_.push_back(new_imu_ptr);

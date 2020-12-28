@@ -5,7 +5,6 @@
 #ifndef LIDAR_LOCALIZATION_IMU_H
 #define LIDAR_LOCALIZATION_IMU_H
 #include "sensors/sensor_interface.h"
-#include <sensor_msgs/Imu.h>
 #include <Eigen/Core>
 #include <Eigen/Dense>
 
@@ -16,9 +15,9 @@ typedef std::shared_ptr<Imu> ImuPtr;
 
 class Imu : public Sensor{
 public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     Imu(): Sensor(0){}
     Imu(double timestamp): Sensor(timestamp){}
-    explicit Imu(const sensor_msgs::ImuConstPtr& imu_msg);
     bool SetMedianValue(const SensorPtr& front_ptr, const SensorPtr& back_ptr, double synced_timestamp,
                                 SensorPtr& median_ptr) override;
     std::string Name() override;

@@ -5,7 +5,8 @@
 #include "data_pretreat/data_pretreat.h"
 #include "global_definition.h"
 #include <ros/ros.h>
-namespace fusion_localization {
+
+using namespace fusion_localization;
 int main(int argc, char** argv) {
     ros::init(argc, argv, "data_pretreat");
     ros::NodeHandle nh;
@@ -20,5 +21,4 @@ int main(int argc, char** argv) {
     }
 
     return 0;
-}
 }

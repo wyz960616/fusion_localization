@@ -13,7 +13,7 @@ OdomSubscriber::OdomSubscriber(const ros::NodeHandle& nh, std::string odom_topic
 }
 
 void OdomSubscriber::OdomMsgCallBack(const nav_msgs::OdometryConstPtr &odom_msg) {
-    SensorPtr new_odom_ptr = std::make_shared<Odom>(odom_msg);
+    SensorPtr new_odom_ptr = SensorFactory::CreateOdomPtr(odom_msg);
     {
         SUB_LOCK(mutex_);
         new_un_synced_data_.push_back(new_odom_ptr);

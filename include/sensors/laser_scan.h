@@ -5,23 +5,40 @@
 #ifndef LIDAR_LOCALIZATION_LASER_SCAN_H
 #define LIDAR_LOCALIZATION_LASER_SCAN_H
 #include "sensors/sensor_interface.h"
-#include <sensor_msgs/LaserScan.h>
+#include "sensors/odom.h"
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
 #include <deque>
+#include <vector>
 
 namespace fusion_localization {
 #define CAST_TO_SCAN(x) std::static_pointer_cast<LaserScan>(x)
 
 class LaserScan;
-typedef std::shared_ptr<LaserScan> ScanPtr;
+typedef std::shared_ptr<LaserScan> LaserScanPtr;
+
 class LaserScan : public Sensor{
 public:
     LaserScan(): Sensor(0){}
-    explicit LaserScan(const sensor_msgs::LaserScanConstPtr& laser_scan_ptr);
+    LaserScan(double timestamp): Sensor(timestamp){}
+    LaserScan(double timestamp, std::vector<float>& ranges, std::vector<float>& intensities,float angle_min, float angle_max,
+              float angle_increment, float time_increment, float range_min, float range_max);
     std::string Name() override;
-    static void ToRosMsg(const ScanPtr& laser_scan, sensor_msgs::LaserScan& laser_scan_ros);
+    bool TransToCloud();
+    //TODO
+    //@激光雷达运动畸变(原地改变数据)
+    bool DistortRemove(const OdomPtr& odom1, const OdomPtr& odom2);
 public:
-    sensor_msgs::LaserScanConstPtr laser_scan_const_ptr;
+    std::vector<float> ranges_;
+    std::vector<float> intensities_;
+    float angle_min_{};
+    float angle_max_{};
+    float angle_increment_{};
+    float time_increment_{};
+    float range_min_{};
+    float range_max_{};
 
+    pcl::PointCloud<pcl::PointXYZI> point_cloud_;
 };
 
 }

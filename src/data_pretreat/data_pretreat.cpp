@@ -3,11 +3,13 @@
 //@Time:2020/12/18 下午1:36                            
 
 #include "data_pretreat/data_pretreat.h"
-
+#include <iostream>
 namespace fusion_localization {
 
 DataPretreat::DataPretreat(const ros::NodeHandle &nh, const std::string& config_path) {
     nh_ = nh;
+    std::cout << "------------预处理节点初始化------------------" << std::endl;
+    std::cout << config_path << std::endl;
     YAML::Node config_node = YAML::LoadFile(config_path);
     InitParameters(config_node);
 
@@ -22,7 +24,7 @@ void DataPretreat::InitParameters(const YAML::Node &config_node) {
     std::string odom_frame_id = config_node["odom"]["frame_id"].as<std::string>();
     std::string odom_child_frame_id = config_node["odom"]["child_frame_id"].as<std::string>();
     int odom_pub_buf_size = config_node["odom"]["pub_buf_size"].as<int>();
-    odom_publisher_ = std::make_shared<OdomPublihser>(nh_, odom_pub_topic, odom_pub_buf_size,
+    odom_publisher_ = std::make_shared<OdomPublisher>(nh_, odom_pub_topic, odom_pub_buf_size,
                                                       odom_frame_id, odom_child_frame_id);
 
     std::string laser_sub_topic = config_node["laser"]["sub_topic"].as<std::string>();
@@ -30,20 +32,19 @@ void DataPretreat::InitParameters(const YAML::Node &config_node) {
     laser_subscriber_ = std::make_shared<LaserSubscriber>(nh_, laser_sub_topic, laser_sub_buf_size);
 
     std::string laser_pub_topic = config_node["laser"]["pub_topic"].as<std::string>();
+    std::string laser_pub_frame_id = config_node["laser"]["frame_id"].as<std::string>();
     int laser_pub_buf_size = config_node["laser"]["pub_buf_size"].as<int>();
-    laser_publisher_ = std::make_shared<LaserPublisher>(nh_, laser_pub_topic, laser_pub_buf_size);
+    laser_publisher_ = std::make_shared<LaserPublisher>(nh_, laser_pub_topic, laser_pub_buf_size, laser_pub_frame_id);
 }
 
 bool DataPretreat::ReadData() {
     static std::deque<SensorPtr>& un_synced_laser_data = laser_subscriber_->un_synced_data_;
-    static std::deque<SensorPtr>& un_synced_odom_data = odom_subscriber_->un_synced_data_;
     static std::deque<SensorPtr>& laser_data = laser_subscriber_->synced_data_;
-    static std::deque<SensorPtr>& synced_odom_data = odom_subscriber_->synced_data_;
-
+    static std::deque<SensorPtr>& un_synced_odom_data = odom_subscriber_->un_synced_data_;
     //从subscriber（带锁）取出数据到un_synced_data
     laser_subscriber_->ParseData();
     odom_subscriber_->ParseData();
-    if(un_synced_laser_data.empty()) {
+    if(un_synced_laser_data.empty() || un_synced_odom_data.empty()) {
         return false;
     }
     //以激光雷达数据时间为对齐点，所以它不存在插值
@@ -56,7 +57,11 @@ bool DataPretreat::ReadData() {
     //@IMU对齐
     // bool imu_synced = laser_subscriber_->SyncedData(scan_time_stamp);
     if(!odom_synced) {
-        //若对齐不成功，将这一帧数据删掉
+        //TODO
+        //若对齐因为要对齐的odom数据在激光时间戳后，导致的不成功，将这一帧数据删掉
+        //若是因为odom数据还未到，则不删除
+        //不过目前好像这样也没什么大问题
+        //std::cout << "对齐不成功" << std::endl;
         laser_data.pop_front();
         return false;
     }
@@ -66,7 +71,7 @@ bool DataPretreat::ReadData() {
 bool DataPretreat::HasSyncedData() {
     if(laser_subscriber_->synced_data_.empty())
         return false;
-    if(laser_subscriber_->synced_data_.empty())
+    if(odom_subscriber_->synced_data_.empty())
         return false;
     return true;
 }
@@ -74,7 +79,7 @@ bool DataPretreat::HasSyncedData() {
 bool DataPretreat::ValidData() {
     static std::deque<SensorPtr>& laser_data = laser_subscriber_->synced_data_;
     static std::deque<SensorPtr>& synced_odom_data = odom_subscriber_->synced_data_;
-
+    //std::cout <<"ValidData: "<< laser_data.size() << " "<< synced_odom_data.size() << std::endl;
     synced_odom_ = CAST_TO_ODOM(synced_odom_data.front());
     distorted_laser_ = CAST_TO_SCAN(laser_data.front());
 
@@ -94,6 +99,7 @@ bool DataPretreat::ValidData() {
     laser_data.pop_front();
     synced_odom_data.pop_front();
 
+    return true;
 }
 
 void DataPretreat::Run() {
@@ -103,7 +109,7 @@ void DataPretreat::Run() {
         if(!ValidData())
             continue;
         LaserDistortionRemove();
-
+        Publish();
     }
 }
 
@@ -115,7 +121,7 @@ void DataPretreat::Publish() {
 
 void DataPretreat::LaserDistortionRemove() {
     //TODO
-    //@ 激光雷达运动畸变的剔除
+    //@激光雷达运动畸变的剔除
     undistorted_laser_ = distorted_laser_;
 }
 

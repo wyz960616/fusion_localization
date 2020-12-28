@@ -1,0 +1,13 @@
+odom:
+   sub_topic: odom
+   sub_buf_size: 100000
+   pub_topic: odom_synced
+   pub_buf_size: 100
+   frame_id: odom
+   child_frame_id: base_footprint
+laser:
+   sub_topic: scan
+   sub_buf_size: 100000
+   pub_topic: scan_undistorted
+   pub_buf_size: 100
+   frame_id: undistorted_scan
