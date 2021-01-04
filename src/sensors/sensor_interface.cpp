@@ -15,12 +15,17 @@ bool Sensor::SetMedianValue(const SensorPtr& front_ptr, const SensorPtr& back_pt
     double front_scale = 0.5, back_scale = 0.5;
     MedianScale(front_ptr->timestamp_, back_ptr->timestamp_,synced_timestamp,
                                  front_scale, back_scale);
-    LOG(INFO) << "The " << Name() << "SetMedianValue do nothing.";
+    LOG(ERROR) << "The " << Name() << "SetMedianValue do nothing.";
     return false;
 }
 bool Sensor::SyncData(std::deque<SensorPtr>& un_synced_data, double synced_timestamp,
                       std::deque<SensorPtr>& synced_data) {
+    SensorPtr median_sensor_ptr;
     while (un_synced_data.size() >= 2) {
+        if(un_synced_data.front()->timestamp_ == synced_timestamp) {
+            median_sensor_ptr = un_synced_data.front();
+            return true;
+        }
         if (un_synced_data.front()->timestamp_ > synced_timestamp)
             return false;
         if (un_synced_data.at(1)->timestamp_ < synced_timestamp) {
@@ -38,7 +43,7 @@ bool Sensor::SyncData(std::deque<SensorPtr>& un_synced_data, double synced_times
         break;
     }
     //TODO
-    //属于另外一种情况，对齐的数据还没到，可以额外添加这种标志位
+    //若对齐的数据还没到，是不是应当保存这个数据？
     if (un_synced_data.size() < 2) {
         return false;
     }
@@ -46,7 +51,6 @@ bool Sensor::SyncData(std::deque<SensorPtr>& un_synced_data, double synced_times
     SensorPtr front_senor_ptr = un_synced_data.at(0);
     SensorPtr last_sensor_ptr = un_synced_data.at(1);
 
-    SensorPtr median_sensor_ptr;
     if(!SetMedianValue(front_senor_ptr, last_sensor_ptr, synced_timestamp, median_sensor_ptr)) {
         return false;
     }

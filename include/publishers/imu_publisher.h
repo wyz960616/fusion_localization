@@ -4,11 +4,20 @@
 
 #ifndef LIDAR_LOCALIZATION_IMU_PUBLISHER_H
 #define LIDAR_LOCALIZATION_IMU_PUBLISHER_H
-
+#include "sensors/sensor_factory.h"
+#include <ros/ros.h>
 
 namespace fusion_localization {
-class imu_publisher {
+class ImuPublisher {
+public:
+public:
+    ImuPublisher(const ros::NodeHandle& nh, const std::string& imu_topic, int buf_size);
+    void Publish(const ImuPtr & imu_ptr);
+private:
+    ros::NodeHandle nh_;
+    ros::Publisher publisher_;
 
+    sensor_msgs::Imu imu_ros_;
 };
 
 }

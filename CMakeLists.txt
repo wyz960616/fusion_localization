@@ -16,7 +16,6 @@ find_package(catkin REQUIRED COMPONENTS
         sensor_msgs
         pcl_ros
         )
-
 set(BACKEND_LIBRARIES "")
 set(ALL_BASIC_LIBRARIES "")
 
@@ -43,9 +42,10 @@ file(GLOB_RECURSE MODEL_SRCS
 
 message(STATUS ${MAPPING_SRCS})
 
-add_library(DATA_MGMT_LIB SHARED ${DATA_MGMT_SRCS})
+add_library(DATA_MGMT_LIB SHARED ${DATA_MGMT_SRCS} src/mapping/back_end/back_end_flow.cpp include/mapping/back_end/back_end_flow.h src/tools/pose_functions.cpp include/tools/pose_functions.h)
 target_link_libraries(DATA_MGMT_LIB ${ALL_BASIC_LIBRARIES})
-
+#set_target_properties(DATA_MGMT_LIB })
+message(STATUS WORINIDABA)
 add_library(MODELS_LIB SHARED ${MODEL_SRCS})
 target_link_libraries(MODELS_LIB ${ALL_BASIC_LIBRARIES} DATA_MGMT_LIB)
 

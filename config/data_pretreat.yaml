@@ -11,3 +11,8 @@ laser:
    pub_topic: scan_undistorted
    pub_buf_size: 100
    frame_id: undistorted_scan
+imu:
+   sub_topic: /mobile_base/sensors/imu_data
+   sub_buf_size: 100000
+   pub_topic: imu_synced
+   pub_buf_size: 100
