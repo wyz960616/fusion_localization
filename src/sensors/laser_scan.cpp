@@ -12,7 +12,7 @@ std::string LaserScan::Name() {
     return "laser-scan-sensor";
 }
 
- bool LaserScan::TransToCloud(pcl::PointCloud<pcl::PointXYZI>& point_cloud) {
+ bool LaserScan::TransToCloud(PointTypes::CLOUD &point_cloud) {
      int size = ranges_.size();
      if(!size){
          return false;
@@ -31,7 +31,7 @@ std::string LaserScan::Name() {
 }
 
 
-bool LaserScan::TransToCloud(const Eigen::Matrix3d &pose, pcl::PointCloud<pcl::PointXYZI>& point_cloud) {
+bool LaserScan::TransToCloud(const Eigen::Matrix3d &pose, PointTypes::CLOUD& point_cloud) {
     int size = ranges_.size();
     if(!size) {
         return false;

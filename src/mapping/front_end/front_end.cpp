@@ -3,11 +3,20 @@
 //@Time:2020/12/28 下午3:49                            
 
 #include "mapping/front_end/front_end.h"
-
+#include <iostream>
 namespace fusion_localization {
 
 FrontEnd::FrontEnd(const YAML::Node &config_node) {
+    std::cout << "------------------初始化FrontEnd----------------------" << std::endl;
+    std::string scan_match_name = config_node["scan_match_name"].as<std::string>();
+    std::cout << "------------------采用的前端配准方法:" << scan_match_name << "----------------------" << std::endl;
+    if(scan_match_name == "pcl_icp") {
+        scan_registration_ = std::make_shared<ICPRegistration>(config_node);
+    }else if(scan_match_name == "pcl_ndt") {
 
+    }else {
+        LOG(ERROR) << "The scan_match method " << scan_match_name << "doesn't exist.";
+    }
 }
 
 bool
@@ -32,7 +41,6 @@ bool FrontEnd::ReadData(const LaserScanPtr &current_scan_ptr, const OdomPtr &cur
 
     return false;
 }
-
 
 bool FrontEnd::Match(const LaserScanPtr &current_scan_ptr, const OdomPtr &current_odom, const ImuPtr &current_imu, Eigen::Matrix4d& precise_estimated) {
     if(!ReadData(current_scan_ptr, current_odom, current_imu)) {

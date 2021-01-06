@@ -1,5 +1,4 @@
 #include<string>
-
 namespace fusion_localization {
 const std::string WORK_SPACE_PATH = "@WORK_SPACE_PATH@";
 }

@@ -6,6 +6,7 @@
 #define LIDAR_LOCALIZATION_LASER_SCAN_H
 #include "sensors/sensor_interface.h"
 #include "sensors/odom.h"
+#include "sensors/point_type.h"
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <Eigen/Core>
@@ -26,8 +27,8 @@ public:
     LaserScan(double timestamp, std::vector<float>& ranges, std::vector<float>& intensities,float angle_min, float angle_max,
               float angle_increment, float time_increment, float range_min, float range_max);
     std::string Name() override;
-    bool TransToCloud(pcl::PointCloud<pcl::PointXYZI>& point_cloud);
-    bool TransToCloud(const Eigen::Matrix3d &pose, pcl::PointCloud<pcl::PointXYZI>& point_cloud);
+    bool TransToCloud(PointTypes::CLOUD &point_cloud);
+    bool TransToCloud(const Eigen::Matrix3d &pose, PointTypes::CLOUD& point_cloud);
     //TODO
     //@激光雷达运动畸变(原地改变数据)
     bool DistortRemove(const OdomPtr& odom1, const OdomPtr& odom2);
@@ -41,7 +42,7 @@ public:
     float range_min_{};
     float range_max_{};
 
-    pcl::PointCloud<pcl::PointXYZI> point_cloud_;
+    PointTypes::CLOUD_PTR point_cloud_;
 };
 
 }

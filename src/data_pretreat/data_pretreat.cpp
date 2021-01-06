@@ -87,6 +87,7 @@ bool DataPretreat::HasSyncedData() {
     if(odom_subscriber_->synced_data_.empty())
         return false;
     if(imu_subscriber_->synced_data_.empty())
+        return false;
     return true;
 }
 
@@ -131,8 +132,6 @@ bool DataPretreat::ValidData() {
  * @breif
  */
 void DataPretreat::Run() {
-    //所线程带锁读取数据
-    //
     if(!ReadData())
         return;
     while(HasSyncedData()) {

@@ -1,0 +1,15 @@
+odom:
+  sub_topic: odom_synced
+  sub_buf_size: 100000
+  pub_topic: front_odom
+  pub_buf_size: 100
+  frame_id: odom
+  child_frame_id: base_footprint
+laser:
+  sub_topic: scan_undistorted
+  sub_buf_size: 100000
+imu:
+  sub_topic: imu_synced
+  sub_buf_size: 100000
+
+front_end: !include front_end.yaml

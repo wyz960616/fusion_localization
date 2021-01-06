@@ -5,7 +5,11 @@
 #include "mapping/front_end/front_end_flow.h"
 
 namespace fusion_localization {
-
+/*!
+ * @breif 由配置文件的参数，完成FrontEndFlow中3个subscriber,1个publisher,以及front_end的初始化
+ * @param nh
+ * @param config_path config文件的具体路径
+ */
 FrontEndFlow::FrontEndFlow(ros::NodeHandle &nh, const std::string &config_path) : nh_(nh){
     YAML::Node config_node = YAML::LoadFile(config_path);
     std::string imu_sub_topic = config_node["imu"]["sub_topic"].as<std::string>();
@@ -31,6 +35,11 @@ FrontEndFlow::FrontEndFlow(ros::NodeHandle &nh, const std::string &config_path) 
 }
 
 
+/*!
+ * @breif 带锁读取数据，并完成数据的时间戳对齐
+ * front_end读取的是data_pretreat中发来预处理过的数据，3个传感器时间戳应完全一致
+ * @return 对齐失败返回false
+ */
 bool FrontEndFlow::ReadData() {
     laser_subscriber_->ParseData();
     odom_subscriber_->ParseData();
@@ -50,6 +59,7 @@ bool FrontEndFlow::HasData() {
         || imu_subscriber_->parsed_data_.empty()){
         return false;
     }
+    return true;
 }
 
 bool FrontEndFlow::ValidData() {
@@ -86,25 +96,33 @@ bool FrontEndFlow::ValidData() {
     return true;
 }
 
+/*!
+ * @breif 由外部调用的运行态函数，读取数据后，完成前端校准，并发布到ROS相应的topic中
+ * @return
+ */
 bool FrontEndFlow::Run() {
     if(!ReadData()) {
         return false;
     }
     while(HasData()) {
         if(ValidData()) {
+            // TODO
+            // front_end利用imu中的线速度，假定机器人短时间内匀速运动，预估机器人下一帧的位置，以完成一下情况的处理:
+            // 匹配失败的可能
+            //1. 里程计打滑，给出的odom作为初值不准确 ------- 直接使用预估值，再进行一次Match
+            //2. 环境发生突变，点云重合度过低 ------- 直接取odom和预估值的中值作为输出
             if(front_end_ptr_->Match(laser_scan_undistorted_, odom_synced_, imu_synced_, precise_estimated_)) {
                 laser_odom_->timestamp_ = laser_scan_undistorted_->timestamp_;
                 laser_odom_->q_ = Eigen::Quaterniond(precise_estimated_.block<3,3>(0,0));
                 laser_odom_->t_ = Eigen::Vector3d(precise_estimated_.block<3,1>(0,3));
+                Publish();
             }else {
-                //打滑处理？
-                laser_odom_->timestamp_ = laser_scan_undistorted_->timestamp_;
-                laser_odom_->q_ = Eigen::Quaterniond(precise_estimated_.block<3,3>(0,0));
-                laser_odom_->t_ = Eigen::Vector3d(precise_estimated_.block<3,1>(0,3));
+
             }
-            Publish();
+            //Publish();
         }
     }
+    return true;
 }
 
 void FrontEndFlow::Publish() {
