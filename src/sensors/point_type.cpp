@@ -11,18 +11,18 @@ namespace fusion_localization {
  * @param color
  * @param out
  */
-void PointTypes::DrawPointCloud(const PointTypes::CLOUD &cloud, cv::Scalar& color, cv::Mat& out) {
+void PointTypes::DrawPointCloud(const PointTypes::CLOUD &cloud, cv::Mat& out, cv::Scalar color) {
     float min_x = 1e15, min_y = 1e15, max_x = -1e15, max_y = -1e15;
     FindBoundary(cloud, min_x, min_y, max_x, max_y);
-    int col_size = static_cast<int>(std::floor(max_x - min_x) + 5);
-    int row_size = static_cast<int>(std::floor(max_y - min_y) + 5);
-    out = cv::Mat::zeros(cv::Size(col_size, row_size), CV_8UC3);
+    int width = static_cast<int>(std::floor(max_x - min_x) + 5);
+    int height = static_cast<int>(std::floor(max_y - min_y) + 5);
+    out = cv::Mat::zeros(cv::Size(width, height), CV_8UC3);
     out.setTo(255);
 
     for(int i = 0 ; i < cloud.size() ; ++i) {
-        int col = static_cast<int>(std::ceil(cloud[i].x - min_x));
-        int row = static_cast<int>(std::ceil(cloud[i].y - min_y));
-        cv::Point point(col, row);
+        int w = static_cast<int>(std::ceil(cloud[i].x - min_x));
+        int h = static_cast<int>(std::ceil(cloud[i].y - min_y));
+        cv::Point point(w, h);
         cv::circle(out, point, 1, color, -1);
     }
 
@@ -36,20 +36,20 @@ void PointTypes::DrawPointCloud(const PointTypes::CLOUD &cloud, cv::Scalar& colo
  * @param color2
  * @param out
  */
-void PointTypes::DrawPointCloud(const PointTypes::CLOUD &cloud1, const PointTypes::CLOUD &cloud2,
-                           const cv::Scalar &color1, const cv::Scalar &color2, cv::Mat& out) {
+void PointTypes::DrawPointCloud(const PointTypes::CLOUD &cloud1,const PointTypes::CLOUD &cloud2,
+                                cv::Mat& out, cv::Scalar color1, cv::Scalar color2){
     float min_x = 1e15, min_y = 1e15, max_x = -1e15, max_y = -1e15;
     FindBoundary(cloud1, min_x, min_y, max_x, max_y);
     FindBoundary(cloud2, min_x, min_y, max_x, max_y);
-    int col_size = static_cast<int>(std::floor(max_x - min_x) + 5);
-    int row_size = static_cast<int>(std::floor(max_y - min_y) + 5);
-    out = cv::Mat::zeros(cv::Size(col_size, row_size), CV_8UC3);
+    int width = static_cast<int>(std::floor(max_x - min_x) + 5);
+    int height = static_cast<int>(std::floor(max_y - min_y) + 5);
+    out = cv::Mat::zeros(cv::Size(width, height), CV_8UC3);
     out.setTo(255);
 
     for(int i = 0 ; i < cloud1.size() ; ++i) {
-        int col = static_cast<int>(std::ceil(cloud1[i].x - min_x));
-        int row = static_cast<int>(std::ceil(cloud1[i].y - min_y));
-        cv::Point point(row, col);
+        int w = static_cast<int>(std::ceil(cloud1[i].x - min_x));
+        int h = static_cast<int>(std::ceil(cloud1[i].y - min_y));
+        cv::Point point(w, h);
         cv::circle(out, point, 2, color1, -1);
     }
 
@@ -86,6 +86,23 @@ void PointTypes::FindBoundary(const PointTypes::CLOUD &cloud, float &min_x, floa
     }
 }
 
+void PointTypes::DrawCompare(const PointTypes::CLOUD &back_cloud, const PointTypes::CLOUD &origin_cloud,const PointTypes::CLOUD &aligned_cloud,
+                             cv::Mat& out, cv::Scalar color1, cv::Scalar color2) {
+    cv::Mat out1;
+    cv::Mat out2;
+    DrawPointCloud(back_cloud, origin_cloud, out1);
+    DrawPointCloud(back_cloud, aligned_cloud, out2);
+
+    int width = static_cast<int>(fmax(out1.size().width, out2.size().width));
+    int height = static_cast<int>(fmax(out1.size().height, out2.size().height));
+    out = cv::Mat(cv::Size(2*(width + 10), height + 10), CV_8UC3);
+
+    cv::Mat left = out(cv::Rect(5,5, out1.size().width, out1.size().height));
+    cv::Mat right = out(cv::Rect(out1.size().width+10, 5, out2.size().width, out2.size().height));
+
+    out1.copyTo(left);
+    out2.copyTo(right);
+}
 
 
 }

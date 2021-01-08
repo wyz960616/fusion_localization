@@ -1,3 +1,6 @@
+imu:
+  sub_topic: imu_synced
+  sub_buf_size: 100000
 odom:
   sub_topic: odom_synced
   sub_buf_size: 100000
@@ -8,8 +11,13 @@ odom:
 laser:
   sub_topic: scan_undistorted
   sub_buf_size: 100000
-imu:
-  sub_topic: imu_synced
-  sub_buf_size: 100000
 
-front_end: !include front_end.yaml
+front_end:
+  scan_match_name: pcl_icp
+  pcl_icp:
+    max_iteration: 100
+    resolution: 1
+    scan2map: false
+    MaxCorrespondenceDistance: 1
+    EuclideanFitnessEpsilon: 0.001
+    TransformationEpsilon: 1e-10

@@ -27,8 +27,10 @@ public:
     LaserScan(double timestamp, std::vector<float>& ranges, std::vector<float>& intensities,float angle_min, float angle_max,
               float angle_increment, float time_increment, float range_min, float range_max);
     std::string Name() override;
+
     bool TransToCloud(PointTypes::CLOUD &point_cloud);
     bool TransToCloud(const Eigen::Matrix3d &pose, PointTypes::CLOUD& point_cloud);
+    bool TransToCloud(const Eigen::Matrix3d &pose);
     //TODO
     //@激光雷达运动畸变(原地改变数据)
     bool DistortRemove(const OdomPtr& odom1, const OdomPtr& odom2);

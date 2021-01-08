@@ -21,11 +21,12 @@ bool Sensor::SetMedianValue(const SensorPtr& front_ptr, const SensorPtr& back_pt
 bool Sensor::SyncData(std::deque<SensorPtr>& un_synced_data, double synced_timestamp,
                       std::deque<SensorPtr>& synced_data) {
     SensorPtr median_sensor_ptr;
+    if(un_synced_data.front()->timestamp_ == synced_timestamp) {
+        median_sensor_ptr = un_synced_data.front();
+        synced_data.push_back(median_sensor_ptr);
+        return true;
+    }
     while (un_synced_data.size() >= 2) {
-        if(un_synced_data.front()->timestamp_ == synced_timestamp) {
-            median_sensor_ptr = un_synced_data.front();
-            return true;
-        }
         if (un_synced_data.front()->timestamp_ > synced_timestamp)
             return false;
         if (un_synced_data.at(1)->timestamp_ < synced_timestamp) {

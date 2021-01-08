@@ -14,7 +14,7 @@
 namespace fusion_localization {
 class ICPRegistration : public ScanRegistration{
 public:
-    ICPRegistration(const YAML::Node& config_node);
+    ICPRegistration(YAML::Node config_node);
     bool ScanToScan(Eigen::Matrix4d &precise_estimated);
     bool ScanToMap(Eigen::Matrix4d &precise_estimated);
     bool Match(Eigen::Matrix4d &precise_estimated) override;

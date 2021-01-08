@@ -4,9 +4,10 @@
 
 #include "tools/pose_functions.h"
 #include "models/scan_matches/icp_registration.h"
+#include "global_definition.h"
 namespace fusion_localization {
 
-ICPRegistration::ICPRegistration(const YAML::Node &config_node) {
+ICPRegistration::ICPRegistration(YAML::Node config_node) {
     max_iteration_ = config_node["max_iteration"].as<int>();
     resolution_ = config_node["resolution"].as<float>();
     scan2map_ = config_node["scan2map"].as<bool>();
@@ -49,17 +50,19 @@ bool ICPRegistration::Match(Eigen::Matrix4d &precise_estimated) {
  * @return 若匹配失败返回false
  */
 bool ICPRegistration::ScanToScan(Eigen::Matrix4d &precise_estimated) {
+    static int cloud_id = 0;
     static bool first_scan = false;
+    ++cloud_id;
     //根据分辨率得到新的雷达数据
-    LaserScanPtr current_laser_scan_ptr_ = std::make_shared<LaserScan>(current_laser_scan_ptr_, resolution_);
     Eigen::Matrix3d rough_estimate_3d;
-    current_laser_scan_ptr_->TransToCloud(rough_estimate_3d, *current_laser_scan_ptr_->point_cloud_);
+    if(!PoseFunctions::Homogeneous4dto3d(rough_estimate_,rough_estimate_3d)) {
+        return false;
+    }
+    current_laser_scan_ptr_ = std::make_shared<LaserScan>(current_laser_scan_ptr_, resolution_);
+    current_laser_scan_ptr_->TransToCloud(rough_estimate_3d);
     if(!first_scan) {
         last_laser_scan_ptr_ = current_laser_scan_ptr_;
         first_scan = true;
-        return false;
-    }
-    if(!PoseFunctions::Homogeneous4dto3d(rough_estimate_,rough_estimate_3d)) {
         return false;
     }
     PointTypes::CLOUD_PTR &last_point_cloud  = last_laser_scan_ptr_->point_cloud_;
@@ -68,14 +71,22 @@ bool ICPRegistration::ScanToScan(Eigen::Matrix4d &precise_estimated) {
         icp_ptr_->setInputSource(current_point_cloud);
         icp_ptr_->setInputTarget(last_point_cloud);
         aligned_cloud_.clear();
-        icp_ptr_->align(aligned_cloud_, precise_estimated);
+        Eigen::Matrix4f e = rough_estimate_.cast<float>();
+        icp_ptr_->align(aligned_cloud_, e);
+        precise_estimated = e.cast<double>();
     }
 
+#ifdef ICP_PRINT
+    cv::Mat out;
+    PointTypes::DrawPointCloud(*last_point_cloud, *current_point_cloud, out);
+    std::string path = WORK_SPACE_PATH + "/icp_compares/pcl_icp_" + std::to_string(cloud_id) + ".png";
+    cv::imwrite(path, out);
+#endif
     Eigen::Matrix3d precise_estimated_3d;
     if(!PoseFunctions::Homogeneous4dto3d(precise_estimated,precise_estimated_3d)) {
         return false;
     }
-    current_laser_scan_ptr_->TransToCloud(precise_estimated_3d, *current_laser_scan_ptr_->point_cloud_);
+    current_laser_scan_ptr_->TransToCloud(precise_estimated_3d);
     last_laser_scan_ptr_ = current_laser_scan_ptr_;
     return true;
 }

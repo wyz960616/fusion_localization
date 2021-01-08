@@ -30,6 +30,9 @@ std::string LaserScan::Name() {
      return true;
 }
 
+bool LaserScan::TransToCloud(const Eigen::Matrix3d &pose) {
+    TransToCloud(pose, *point_cloud_);
+}
 
 bool LaserScan::TransToCloud(const Eigen::Matrix3d &pose, PointTypes::CLOUD& point_cloud) {
     int size = ranges_.size();
@@ -66,8 +69,9 @@ LaserScan::LaserScan(double timestamp, std::vector<float>& ranges, std::vector<f
                      angle_increment_(angle_increment),
                      time_increment_(time_increment),
                      range_min_(range_min),
-                     range_max_(range_max){
-    //TransToCloud();
+                     range_max_(range_max),
+                     point_cloud_(new PointTypes::CLOUD){
+    //TransToCloud(*point_cloud_);
 }
 
 LaserScan::LaserScan(const LaserScanPtr& laser_scan_ptr, float resolution) : Sensor(laser_scan_ptr->timestamp_){
@@ -81,6 +85,7 @@ LaserScan::LaserScan(const LaserScanPtr& laser_scan_ptr, float resolution) : Sen
     time_increment_ = laser_scan_ptr->time_increment_;
     range_min_ = laser_scan_ptr->range_min_;
     range_max_ = laser_scan_ptr->range_max_;
+    point_cloud_ = PointTypes::CLOUD_PTR(new PointTypes::CLOUD);
 }
 
 

@@ -9,7 +9,7 @@ add_definitions(-std=c++11)
 set(NAMESPACES_OPEN "fusion_localization")
 
 #add_definitions(-DPRINT_TEST_INFO)
-
+add_definitions(-DICP_PRINT)
 find_package(catkin REQUIRED COMPONENTS
         roscpp
         nav_msgs
@@ -24,6 +24,7 @@ include(cmake/YAML.cmake)
 include(cmake/eigen.cmake)
 include(cmake/g2o.cmake)
 include(cmake/sophus.cmake)
+include(cmake/PCL.cmake)
 include(cmake/global_definition.cmake)
 include(cmake/OpenCV.cmake)
 include_directories(include ${catkin_INCLUDE_DIRS})
@@ -49,7 +50,7 @@ target_link_libraries(DATA_MGMT_LIB ${ALL_BASIC_LIBRARIES} ${OpenCV_LIBS})
 
 message(STATUS WORINIDABA)
 add_library(MODELS_LIB SHARED ${MODEL_SRCS})
-target_link_libraries(MODELS_LIB ${ALL_BASIC_LIBRARIES} DATA_MGMT_LIB)
+target_link_libraries(MODELS_LIB ${ALL_BASIC_LIBRARIES} ${PCL_LIBRARIES} DATA_MGMT_LIB)
 
 add_library(MAPPING_LIB SHARED ${MAPPING_SRCS})
 target_link_libraries(MAPPING_LIB ${ALL_BASIC_LIBRARIES} ${BACKEND_LIBRARIES} MODELS_LIB DATA_MGMT_LIB)

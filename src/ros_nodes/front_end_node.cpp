@@ -10,7 +10,7 @@ int main(int argc, char **argv) {
     ros::init(argc, argv, "front_end_node");
     ros::NodeHandle nh;
 
-    std::string config_path = WORK_SPACE_PATH + "/config/front_end.yaml";
+    std::string config_path = WORK_SPACE_PATH + "/config/front_end_flow.yaml";
     std::shared_ptr<FrontEndFlow> front_end_flow = std::make_shared<FrontEndFlow>(nh, config_path);
 
     ros::Rate rate(100);

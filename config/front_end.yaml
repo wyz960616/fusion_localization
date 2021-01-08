@@ -1,8 +1,0 @@
-max_iteration_: 100
-resolution: 1
-scan2map: false
-
-pcl_icp:
-    MaxCorrespondenceDistance: 1
-    EuclideanFitnessEpsilon: 0.001
-    TransformationEpsilon: 1e-10
