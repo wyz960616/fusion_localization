@@ -7,30 +7,30 @@
 #include "global_definition.h"
 namespace fusion_localization {
 
-int LibIcpRegistration::TransToDoubleVector(double* M, const LaserScanPtr &laser_ptr) {
+int LibIcpRegistration::TransToDoubleVector(double** M, const LaserScanPtr &laser_ptr) const {
     if (laser_ptr == nullptr) {
         return false;
     }
-    int num;
+    int num = 0;
     for (auto &range:laser_ptr->ranges_) {
         if(range ==  INFINITY || range > laser_ptr->range_max_ || range < laser_ptr->range_min_) {
             continue;
         }
         ++num;
     }
-    M = (double*)calloc(dim_ * num, sizeof(double));
+    *M = (double*)calloc(dim_ * num, sizeof(double));
 
     int k = 0;
-    for(int i = 0 ; i < laser_ptr->ranges_.size() ; ++i) {
+    for(auto i = 0 ; i < laser_ptr->ranges_.size() ; ++i) {
         if(laser_ptr->ranges_[i] ==  INFINITY || laser_ptr->ranges_[i] > laser_ptr->range_max_ || laser_ptr->ranges_[i] < laser_ptr->range_min_) {
             continue;
         }
         float angle = laser_ptr->angle_min_ + laser_ptr->angle_increment_ * float(i);
-        M[k*2 + 0] = laser_ptr->ranges_[i] * cos(angle);
-        M[k*2 + 1] = laser_ptr->ranges_[i] * sin(angle);
+        (*M)[k*2 + 0] = laser_ptr->ranges_[i] * cos(angle);
+        (*M)[k*2 + 1] = laser_ptr->ranges_[i] * sin(angle);
         ++k;
     }
-    if( k != num) {
+    if( k != num ) {
         LOG(ERROR) << "有效点个数转换错误";
     }
     return k;
@@ -63,11 +63,16 @@ bool LibIcpRegistration::ScanToScan(Eigen::Matrix4d &precise_estimated) {
         return true;
     }
 
-    double *target, *source;
-    int num1 = TransToDoubleVector(target, last_laser_scan_ptr_);
+    double *target = nullptr, *source = nullptr;
+    int num1 = TransToDoubleVector(&target, last_laser_scan_ptr_);
+    if(!target) {
+        return false;
+    }
     TransToWord(target, num1, last_laser_scan_ptr_->R_, last_laser_scan_ptr_->t_);
-    int num2 = TransToDoubleVector(source, current_laser_scan_ptr_);
-    
+    int num2 = TransToDoubleVector(&source, current_laser_scan_ptr_);
+    if(!source) {
+        return false;
+    }
     Matrix R = Matrix::eye(2);
     Matrix t(2,1);
     R.val[0][0] = rough_estimate_3d(0,0);

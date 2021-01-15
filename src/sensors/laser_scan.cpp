@@ -26,7 +26,7 @@ std::string LaserScan::Name() {
          }
          point.x = ranges_[i] * cos(angle);
          point.y = ranges_[i] * sin(angle);
-         point.z = 1.0;
+         point.z = 0.0;
          point.intensity = intensities_[i];
          point_cloud.push_back(point);
      }
@@ -34,7 +34,7 @@ std::string LaserScan::Name() {
 }
 
 bool LaserScan::TransToCloud(const Eigen::Matrix3d &pose) {
-    TransToCloud(pose, *point_cloud_);
+    return TransToCloud(pose, *point_cloud_);
 }
 
 bool LaserScan::TransToCloud() {
@@ -43,7 +43,7 @@ bool LaserScan::TransToCloud() {
     pose.block<2,2>(0,0) = R_;
     pose.block<2,1>(0,2) = t_;
 
-    TransToCloud(pose, *point_cloud_);
+    return TransToCloud(pose, *point_cloud_);
 }
 
 bool LaserScan::TransToCloud(const Eigen::Matrix3d &pose, PointTypes::CLOUD& point_cloud) {
@@ -66,7 +66,7 @@ bool LaserScan::TransToCloud(const Eigen::Matrix3d &pose, PointTypes::CLOUD& poi
         t = Rotation * t + translation;
         point.x = t.x();
         point.y = t.y();
-        point.z = 1.0;
+        point.z = 0.0;
         point.intensity = intensities_[i];
         point_cloud.push_back(point);
     }

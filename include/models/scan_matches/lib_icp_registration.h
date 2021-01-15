@@ -18,7 +18,7 @@ public:
 
     typedef enum{Point2Point, Point2Plane} LIBICP_TYPE;
 protected:
-    int TransToDoubleVector(double* M, const LaserScanPtr &laser_ptr);
+    int TransToDoubleVector(double** M, const LaserScanPtr &laser_ptr) const;
     int TransToWord(double* M, int size, const Eigen::Matrix2d &R, const Eigen::Vector2d &t);
 private:
     bool scan2map_ = false;

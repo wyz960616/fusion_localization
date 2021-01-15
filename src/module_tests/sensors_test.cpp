@@ -40,7 +40,7 @@ bool ReadData() {
 }
 
 bool ValidData() {
-
+    return false;
 }
 
 int main(int argc, char**argv) {
