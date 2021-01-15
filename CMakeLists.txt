@@ -27,7 +27,7 @@ include(cmake/sophus.cmake)
 include(cmake/PCL.cmake)
 include(cmake/global_definition.cmake)
 include(cmake/OpenCV.cmake)
-include_directories(include ${catkin_INCLUDE_DIRS})
+include_directories(include ${catkin_INCLUDE_DIRS} 3rdparty)
 
 file(GLOB DATA_MGMT_SRCS
         "src/sensors/*.cpp"
@@ -41,6 +41,8 @@ file(GLOB_RECURSE MAPPING_SRCS
 file(GLOB_RECURSE MODEL_SRCS
         "src/models/*.cpp"
         )
+
+add_subdirectory(3rdparty/libicp)
 
 message(STATUS ${MAPPING_SRCS})
 

@@ -31,6 +31,7 @@ public:
     bool TransToCloud(PointTypes::CLOUD &point_cloud);
     bool TransToCloud(const Eigen::Matrix3d &pose, PointTypes::CLOUD& point_cloud);
     bool TransToCloud(const Eigen::Matrix3d &pose);
+    bool TransToCloud();
     //TODO
     //@激光雷达运动畸变(原地改变数据)
     bool DistortRemove(const OdomPtr& odom1, const OdomPtr& odom2);
@@ -45,6 +46,9 @@ public:
     float range_max_{};
 
     PointTypes::CLOUD_PTR point_cloud_;
+    //当前laser的pose
+    Eigen::Matrix2d R_ = Eigen::Matrix2d::Identity();
+    Eigen::Vector2d t_ ;
 };
 
 }

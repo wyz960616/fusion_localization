@@ -5,6 +5,8 @@
 #include "tools/pose_functions.h"
 #include "models/scan_matches/icp_registration.h"
 #include "global_definition.h"
+#include <pcl/io/pcd_io.h>
+
 namespace fusion_localization {
 
 ICPRegistration::ICPRegistration(YAML::Node config_node) {
@@ -50,20 +52,23 @@ bool ICPRegistration::Match(Eigen::Matrix4d &precise_estimated) {
  * @return 若匹配失败返回false
  */
 bool ICPRegistration::ScanToScan(Eigen::Matrix4d &precise_estimated) {
-    static int cloud_id = 0;
-    static bool first_scan = false;
+    static int cloud_id = -1;
+    static bool first_scan = true;
     ++cloud_id;
     //根据分辨率得到新的雷达数据
     Eigen::Matrix3d rough_estimate_3d;
     if(!PoseFunctions::Homogeneous4dto3d(rough_estimate_,rough_estimate_3d)) {
+        LOG(WARNING) << "初始的odom四维齐次坐标转换失败";
         return false;
     }
     current_laser_scan_ptr_ = std::make_shared<LaserScan>(current_laser_scan_ptr_, resolution_);
     current_laser_scan_ptr_->TransToCloud(rough_estimate_3d);
-    if(!first_scan) {
+    if(first_scan) {
         last_laser_scan_ptr_ = current_laser_scan_ptr_;
-        first_scan = true;
-        return false;
+        last_laser_scan_ptr_->R_ = rough_estimate_3d.block<2,2>(0,0);
+        last_laser_scan_ptr_->t_ = rough_estimate_3d.block<2,1>(0,2);
+        first_scan = false;
+        return true;
     }
     PointTypes::CLOUD_PTR &last_point_cloud  = last_laser_scan_ptr_->point_cloud_;
     PointTypes::CLOUD_PTR &current_point_cloud = current_laser_scan_ptr_->point_cloud_;
@@ -77,13 +82,17 @@ bool ICPRegistration::ScanToScan(Eigen::Matrix4d &precise_estimated) {
     }
 
 #ifdef ICP_PRINT
-    cv::Mat out;
-    PointTypes::DrawPointCloud(*last_point_cloud, *current_point_cloud, out);
-    std::string path = WORK_SPACE_PATH + "/icp_compares/pcl_icp_" + std::to_string(cloud_id) + ".png";
-    cv::imwrite(path, out);
+    {
+        cv::Mat out;
+        PointTypes::DrawCompare(*last_point_cloud, *current_point_cloud, aligned_cloud_, out);
+        std::string path = WORK_SPACE_PATH + "/icp_compares/pcl_icp_" + std::to_string(cloud_id) + "_compare.png";
+        cv::imwrite(path, out);
+    };
 #endif
+
     Eigen::Matrix3d precise_estimated_3d;
     if(!PoseFunctions::Homogeneous4dto3d(precise_estimated,precise_estimated_3d)) {
+        LOG(WARNING) << "icp变换后四维齐次坐标转换失败";
         return false;
     }
     current_laser_scan_ptr_->TransToCloud(precise_estimated_3d);

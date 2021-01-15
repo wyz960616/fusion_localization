@@ -13,7 +13,7 @@ laser:
   sub_buf_size: 100000
 
 front_end:
-  scan_match_name: pcl_icp
+  scan_match_name: lib_icp
   pcl_icp:
     max_iteration: 100
     resolution: 1
@@ -21,3 +21,4 @@ front_end:
     MaxCorrespondenceDistance: 1
     EuclideanFitnessEpsilon: 0.001
     TransformationEpsilon: 1e-10
+  lib_icp:

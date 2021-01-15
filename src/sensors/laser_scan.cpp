@@ -21,6 +21,9 @@ std::string LaserScan::Name() {
      for(int i = 0 ; i < size ; ++i) {
          pcl::PointXYZI point;
          float angle = angle_min_ + angle_increment_ * i;
+         if(ranges_[i] ==  INFINITY || ranges_[i] > range_max_ || ranges_[i] < range_min_) {
+             continue;
+         }
          point.x = ranges_[i] * cos(angle);
          point.y = ranges_[i] * sin(angle);
          point.z = 1.0;
@@ -31,6 +34,15 @@ std::string LaserScan::Name() {
 }
 
 bool LaserScan::TransToCloud(const Eigen::Matrix3d &pose) {
+    TransToCloud(pose, *point_cloud_);
+}
+
+bool LaserScan::TransToCloud() {
+    Eigen::Matrix3d pose;
+    pose.setIdentity();
+    pose.block<2,2>(0,0) = R_;
+    pose.block<2,1>(0,2) = t_;
+
     TransToCloud(pose, *point_cloud_);
 }
 
@@ -46,6 +58,9 @@ bool LaserScan::TransToCloud(const Eigen::Matrix3d &pose, PointTypes::CLOUD& poi
         pcl::PointXYZI point;
         float angle = angle_min_ + angle_increment_ * i;
         Eigen::Vector2d t;
+        if(ranges_[i] ==  INFINITY || ranges_[i] > range_max_ || ranges_[i] < range_min_) {
+            continue;
+        }
         t.x() = ranges_[i] * cos(angle);
         t.y() = ranges_[i] * sin(angle);
         t = Rotation * t + translation;

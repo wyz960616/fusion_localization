@@ -14,14 +14,14 @@ namespace fusion_localization {
 void PointTypes::DrawPointCloud(const PointTypes::CLOUD &cloud, cv::Mat& out, cv::Scalar color) {
     float min_x = 1e15, min_y = 1e15, max_x = -1e15, max_y = -1e15;
     FindBoundary(cloud, min_x, min_y, max_x, max_y);
-    int width = static_cast<int>(std::floor(max_x - min_x) + 5);
-    int height = static_cast<int>(std::floor(max_y - min_y) + 5);
+    int width = static_cast<int>(std::floor(max_x - min_x)) * 100 + 200;
+    int height = static_cast<int>(std::floor(max_y - min_y)) * 100 + 200;
     out = cv::Mat::zeros(cv::Size(width, height), CV_8UC3);
     out.setTo(255);
 
     for(int i = 0 ; i < cloud.size() ; ++i) {
-        int w = static_cast<int>(std::ceil(cloud[i].x - min_x));
-        int h = static_cast<int>(std::ceil(cloud[i].y - min_y));
+        int w = static_cast<int>(std::ceil(cloud[i].x * 100 - min_x * 100)) + 100;
+        int h = static_cast<int>(std::ceil(cloud[i].y * 100- min_y * 100 )) + 100;
         cv::Point point(w, h);
         cv::circle(out, point, 1, color, -1);
     }
@@ -29,7 +29,7 @@ void PointTypes::DrawPointCloud(const PointTypes::CLOUD &cloud, cv::Mat& out, cv
 }
 
 /*!
- * @breif 在Mat上绘制两个二维点云数据
+ * @breif 在Mat上绘制两个二维点云数据，由于原始数据过小，乘以100
  * @param cloud1
  * @param cloud2
  * @param color1
@@ -41,21 +41,19 @@ void PointTypes::DrawPointCloud(const PointTypes::CLOUD &cloud1,const PointTypes
     float min_x = 1e15, min_y = 1e15, max_x = -1e15, max_y = -1e15;
     FindBoundary(cloud1, min_x, min_y, max_x, max_y);
     FindBoundary(cloud2, min_x, min_y, max_x, max_y);
-    int width = static_cast<int>(std::floor(max_x - min_x) + 5);
-    int height = static_cast<int>(std::floor(max_y - min_y) + 5);
+    int width = static_cast<int>(std::floor(max_x - min_x)) * 100 + 200;
+    int height = static_cast<int>(std::floor(max_y - min_y)) * 100 + 200;
     out = cv::Mat::zeros(cv::Size(width, height), CV_8UC3);
     out.setTo(255);
-
     for(int i = 0 ; i < cloud1.size() ; ++i) {
-        int w = static_cast<int>(std::ceil(cloud1[i].x - min_x));
-        int h = static_cast<int>(std::ceil(cloud1[i].y - min_y));
+        int w = static_cast<int>(std::ceil(cloud1[i].x * 100 - min_x * 100)) + 100;
+        int h = static_cast<int>(std::ceil(cloud1[i].y * 100 - min_y * 100)) + 100;
         cv::Point point(w, h);
         cv::circle(out, point, 2, color1, -1);
     }
-
     for(int i = 0 ; i < cloud2.size() ; ++i) {
-        int col = static_cast<int>(std::ceil(cloud2[i].x - min_x));
-        int row = static_cast<int>(std::ceil(cloud2[i].y - min_y));
+        int col = static_cast<int>(std::ceil(cloud2[i].x * 100 - min_x * 100)) + 100;
+        int row = static_cast<int>(std::ceil(cloud2[i].y * 100 - min_y * 100)) + 100;
         cv::Point point(col, row);
         cv::circle(out, point, 1, color2, -1);
     }

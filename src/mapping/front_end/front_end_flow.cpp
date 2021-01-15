@@ -36,8 +36,11 @@ FrontEndFlow::FrontEndFlow(ros::NodeHandle &nh, const std::string &config_path) 
     int odom_pub_buf_size = config_node["odom"]["pub_buf_size"].as<int>();
     laser_odom_publihser_ = std::make_shared<OdomPublisher>(nh_, odom_pub_topic, odom_pub_buf_size,
                                                       odom_frame_id, odom_child_frame_id);
+
+    laser_odom_ = std::make_shared<Odom>();
     YAML::Node node2 = config_node["front_end"];
     front_end_ptr_ = std::make_shared<FrontEnd>(node2);
+
 }
 
 

@@ -13,8 +13,11 @@ FrontEnd::FrontEnd(const YAML::Node& config_node) {
     if(scan_match_name == "pcl_icp") {
         scan_registration_ = std::make_shared<ICPRegistration>(config_node["pcl_icp"]);
     }else if(scan_match_name == "pcl_ndt") {
-
-    }else {
+        scan_registration_ = std::make_shared<ICPRegistration>(config_node["pcl_ndt"]);
+    }else if(scan_match_name == "lib_icp") {
+        scan_registration_ = std::make_shared<ICPRegistration>(config_node["lib_icp"]);
+    }
+    else {
         LOG(ERROR) << "The scan_match method " << scan_match_name << "doesn't exist.";
     }
 }
@@ -53,7 +56,8 @@ bool FrontEnd::Match(const LaserScanPtr &current_scan_ptr, const OdomPtr &curren
     rough_estimate.block<3,1>(0,3) = current_odom->t_;
 
     scan_registration_->SetParameters(current_scan_ptr, rough_estimate);
-    scan_registration_->Match(precise_estimated);
+    return scan_registration_->Match(precise_estimated);
+
 }
 
 }
