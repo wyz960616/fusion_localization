@@ -2,8 +2,12 @@
 //@Author:wyz
 //@Time:2020/12/28 下午3:49                            
 
-#include "mapping/front_end/front_end.h"
 #include <iostream>
+#include "mapping/front_end/front_end.h"
+#include "models/scan_matches/icp_registration.h"
+#include "models/scan_matches/ndt_registration.h"
+#include "models/scan_matches/lib_icp_registration.h"
+
 namespace fusion_localization {
 
 FrontEnd::FrontEnd(const YAML::Node& config_node) {
@@ -13,9 +17,9 @@ FrontEnd::FrontEnd(const YAML::Node& config_node) {
     if(scan_match_name == "pcl_icp") {
         scan_registration_ = std::make_shared<ICPRegistration>(config_node["pcl_icp"]);
     }else if(scan_match_name == "pcl_ndt") {
-        scan_registration_ = std::make_shared<ICPRegistration>(config_node["pcl_ndt"]);
+        scan_registration_ = std::make_shared<NdtRegistration>(config_node["pcl_ndt"]);
     }else if(scan_match_name == "lib_icp") {
-        scan_registration_ = std::make_shared<ICPRegistration>(config_node["lib_icp"]);
+        scan_registration_ = std::make_shared<LibIcpRegistration>(config_node["lib_icp"]);
     }
     else {
         LOG(ERROR) << "The scan_match method " << scan_match_name << "doesn't exist.";

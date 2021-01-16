@@ -61,17 +61,31 @@ bool ICPRegistration::ScanToScan(Eigen::Matrix4d &precise_estimated) {
         LOG(WARNING) << "初始的odom四维齐次坐标转换失败";
         return false;
     }
+#ifdef REGISTRATION_PRINT
+    PointTypes::CLOUD cloud;
+    std::cout << rough_estimate_ << std::endl;
+    current_laser_scan_ptr_->TransToCloud(rough_estimate_3d,cloud);
+    std::string path = WORK_SPACE_PATH + "/registration_compares/pcl_icp_" + std::to_string(cloud_id) + ".pcd";
+    pcl::io::savePCDFileASCII(path,cloud);
+#endif
+    //转换到设定的分辨率
     current_laser_scan_ptr_ = std::make_shared<LaserScan>(current_laser_scan_ptr_, resolution_);
-    current_laser_scan_ptr_->TransToCloud(rough_estimate_3d);
+    //由scan变化到点云
+    PointTypes::CLOUD_PTR &current_point_cloud = current_laser_scan_ptr_->point_cloud_;
+    current_laser_scan_ptr_->TransToCloud(*current_point_cloud);
     if(first_scan) {
         last_laser_scan_ptr_ = current_laser_scan_ptr_;
         last_laser_scan_ptr_->R_ = rough_estimate_3d.block<2,2>(0,0);
         last_laser_scan_ptr_->t_ = rough_estimate_3d.block<2,1>(0,2);
+        //将内部点云转换到世界坐标系下
+        last_laser_scan_ptr_->TransToCloud(rough_estimate_3d);
         first_scan = false;
         return true;
     }
     PointTypes::CLOUD_PTR &last_point_cloud  = last_laser_scan_ptr_->point_cloud_;
-    PointTypes::CLOUD_PTR &current_point_cloud = current_laser_scan_ptr_->point_cloud_;
+
+    //target为上一帧在世界坐标系下的点云
+    //Source为当前帧在自身坐标下的点云
     {
         icp_ptr_->setInputSource(current_point_cloud);
         icp_ptr_->setInputTarget(last_point_cloud);
@@ -79,24 +93,25 @@ bool ICPRegistration::ScanToScan(Eigen::Matrix4d &precise_estimated) {
         Eigen::Matrix4f e = rough_estimate_.cast<float>();
         icp_ptr_->align(aligned_cloud_, e);
         precise_estimated = e.cast<double>();
+        std::cout << precise_estimated << std::endl;
     }
-
-#ifdef ICP_PRINT
-    {
-        cv::Mat out;
-        PointTypes::DrawCompare(*last_point_cloud, *current_point_cloud, aligned_cloud_, out);
-        std::string path = WORK_SPACE_PATH + "/icp_compares/pcl_icp_" + std::to_string(cloud_id) + "_compare.png";
-        cv::imwrite(path, out);
-    };
-#endif
-
     Eigen::Matrix3d precise_estimated_3d;
     if(!PoseFunctions::Homogeneous4dto3d(precise_estimated,precise_estimated_3d)) {
-        LOG(WARNING) << "icp变换后四维齐次坐标转换失败";
+        LOG(WARNING) << "ndt变换后四维齐次坐标转换失败";
         return false;
     }
     current_laser_scan_ptr_->TransToCloud(precise_estimated_3d);
     last_laser_scan_ptr_ = current_laser_scan_ptr_;
+#ifdef REGISTRATION_PRINT
+    {
+        PointTypes::CLOUD before_cloud;
+        current_laser_scan_ptr_->TransToCloud(rough_estimate_3d,before_cloud);
+        cv::Mat out;
+        PointTypes::DrawCompare(*last_point_cloud, before_cloud, aligned_cloud_, out);
+        std::string path = WORK_SPACE_PATH + "/registration_compares/pcl_icp_" + std::to_string(cloud_id) + "_compare.png";
+        cv::imwrite(path, out);
+    };
+#endif
     return true;
 }
 

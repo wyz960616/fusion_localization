@@ -13,7 +13,7 @@ laser:
   sub_buf_size: 100000
 
 front_end:
-  scan_match_name: lib_icp
+  scan_match_name: pcl_icp
   pcl_icp:
     max_iteration: 100
     resolution: 1
@@ -21,4 +21,13 @@ front_end:
     MaxCorrespondenceDistance: 1
     EuclideanFitnessEpsilon: 0.001
     TransformationEpsilon: 1e-10
-  lib_icp:
+  pcl_ndt:
+    MaximumIterations: 40
+    GridCentre: [0.0,0.0]
+    GridExtent: [20,20]
+    GridStep: [20,20]
+    OptimizationStepSize: [0.4,0.4,0.1]
+    TransformationEpsilon: 1e-9
+    resolution: 1
+    scan2map: false
+

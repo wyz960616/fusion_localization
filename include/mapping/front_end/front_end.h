@@ -5,7 +5,7 @@
 #ifndef LIDAR_LOCALIZATION_FRONT_END_H
 #define LIDAR_LOCALIZATION_FRONT_END_H
 #include "sensors/sensor_factory.h"
-#include "models/scan_matches/icp_registration.h"
+#include "models/scan_matches/scan_registration.h"
 #include <yaml-cpp/yaml.h>
 #include <memory>
 #include <string>

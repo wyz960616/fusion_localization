@@ -9,7 +9,7 @@ add_definitions(-std=c++11)
 set(NAMESPACES_OPEN "fusion_localization")
 
 #add_definitions(-DPRINT_TEST_INFO)
-add_definitions(-DICP_PRINT)
+add_definitions(-DREGISTRATION_PRINT)
 find_package(catkin REQUIRED COMPONENTS
         roscpp
         nav_msgs
